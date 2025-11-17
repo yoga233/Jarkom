@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jelajahi - Moviemu Lek</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        .genre-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .genre-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        }
+        
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #111827;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #374151;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-gray-950 text-gray-100">
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full bg-gray-900/95 backdrop-blur-sm border-b border-gray-800 z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between h-16">
+                <a href="index.html" class="flex items-center space-x-2">
+                    <i class="fas fa-film text-red-500 text-xl"></i>
+                    <span class="text-xl font-bold">Moviemu Lek</span>
+                </a>
+                
+                <div class="flex items-center space-x-6">
+                    <a href="index.html" class="text-sm font-medium text-gray-400 hover:text-white transition">Beranda</a>
+                    <a href="search.html" class="text-sm font-medium text-gray-400 hover:text-white transition">Pencarian</a>
+                    <a href="browse.html" class="text-sm font-medium text-red-500">Jelajahi</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="pt-24 pb-12 px-4">
+        <div class="container mx-auto">
+            <h1 class="text-4xl font-bold mb-3">Jelajahi Berdasarkan Genre</h1>
+            <p class="text-gray-400">Temukan film dan series berdasarkan genre favorit</p>
+        </div>
+    </section>
+
+    <!-- Genres Grid -->
+    <section class="px-4 pb-16">
+        <div class="container mx-auto">
+            <div id="genresGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <!-- Loading state -->
+                <div class="col-span-full text-center py-12 text-gray-400">
+                    <i class="fas fa-spinner fa-spin text-3xl mb-4"></i>
+                    <p>Memuat genre...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 border-t border-gray-800">
+        <div class="container mx-auto px-4 py-8">
+            <div class="text-center text-sm text-gray-500">
+                <p class="mb-1">&copy; 2025 Moviemu Lek</p>
+                <p>Developed by Yoga & Franky - Mahasiswa ITATS</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const API_URL = 'http://localhost:3000/api';
+
+        // Genre icons mapping
+        const genreIcons = {
+            'action': 'fa-explosion',
+            'adventure': 'fa-compass',
+            'animation': 'fa-wand-magic-sparkles',
+            'comedy': 'fa-face-laugh',
+            'crime': 'fa-handcuffs',
+            'documentary': 'fa-video',
+            'drama': 'fa-masks-theater',
+            'family': 'fa-people-group',
+            'fantasy': 'fa-hat-wizard',
+            'history': 'fa-landmark',
+            'horror': 'fa-ghost',
+            'music': 'fa-music',
+            'mystery': 'fa-magnifying-glass',
+            'romance': 'fa-heart',
+            'science fiction': 'fa-rocket',
+            'thriller': 'fa-user-secret',
+            'war': 'fa-shield-halved',
+            'western': 'fa-horse'
+        };
+
+        // Load genres
+        async function loadGenres() {
+            try {
+                const response = await fetch(`${API_URL}/genres`);
+                const result = await response.json();
+                displayGenres(result.data);
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('genresGrid').innerHTML = `
+                    <div class="col-span-full text-center py-12 text-red-500">
+                        <i class="fas fa-exclamation-circle text-3xl mb-4"></i>
+                        <p>Gagal memuat genre</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Display genres
+        function displayGenres(genres) {
+            const grid = document.getElementById('genresGrid');
+            
+            grid.innerHTML = genres.map(genre => {
+                const genreName = genre.name.toLowerCase();
+                const icon = genreIcons[genreName] || 'fa-film';
+                
+                return `
+                    <div onclick="openGenre('${genre.url.replace('/api/genres/', '')}')" 
+                         class="genre-card bg-gray-900 border border-gray-800 rounded-lg p-6 cursor-pointer group">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-red-500/10 rounded-lg flex items-center justify-center group-hover:bg-red-500 transition">
+                                <i class="fas ${icon} text-red-500 group-hover:text-white text-xl transition"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold group-hover:text-red-500 transition">${genre.name}</h3>
+                                <p class="text-sm text-gray-500">Lihat koleksi</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Open genre
+        function openGenre(slug) {
+            window.location.href = `search.html?genre=${slug}`;
+        }
+
+        // Initialize
+        loadGenres();
+    </script>
+</body>
+</html>

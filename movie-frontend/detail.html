@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detail - Moviemu Lek</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        .download-btn {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+        
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #111827;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #374151;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-gray-950 text-gray-100">
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full bg-gray-900/95 backdrop-blur-sm border-b border-gray-800 z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between h-16">
+                <a href="index.html" class="flex items-center space-x-2">
+                    <i class="fas fa-film text-red-500 text-xl"></i>
+                    <span class="text-xl font-bold">Moviemu Lek</span>
+                </a>
+                
+                <a href="index.html" class="text-sm font-medium text-gray-400 hover:text-white transition">
+                    <i class="fas fa-arrow-left mr-2"></i>Kembali
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Loading -->
+    <div id="loading" class="min-h-screen flex items-center justify-center pt-20">
+        <div class="text-center">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-gray-700 border-t-red-500 mb-4"></div>
+            <p class="text-gray-400">Memuat data...</p>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div id="movieDetail" class="hidden pt-20">
+        <!-- Hero Section -->
+        <div class="relative">
+            <div id="backdrop" class="absolute inset-0 bg-cover bg-center opacity-10 blur-2xl"></div>
+            <div class="absolute inset-0 bg-gradient-to-b from-gray-950/50 via-gray-950 to-gray-950"></div>
+            
+            <div class="container mx-auto px-4 py-12 relative z-10">
+                <div class="grid md:grid-cols-[300px_1fr] gap-8">
+                    <!-- Poster -->
+                    <div>
+                        <img id="poster" src="" alt="" class="w-full rounded-lg shadow-xl">
+                    </div>
+
+                    <!-- Info -->
+                    <div>
+                        <h1 id="title" class="text-4xl font-bold mb-2"></h1>
+                        <p id="tagline" class="text-gray-400 italic mb-6"></p>
+
+                        <!-- Meta Grid -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                            <div class="bg-gray-900 border border-gray-800 rounded-lg p-4">
+                                <div class="text-xs text-gray-500 mb-1">Tahun</div>
+                                <div id="year" class="font-semibold">-</div>
+                            </div>
+                            <div class="bg-gray-900 border border-gray-800 rounded-lg p-4">
+                                <div class="text-xs text-gray-500 mb-1">Rating</div>
+                                <div id="rating" class="font-semibold flex items-center space-x-1">
+                                    <i class="fas fa-star text-yellow-500 text-xs"></i>
+                                    <span>-</span>
+                                </div>
+                            </div>
+                            <div class="bg-gray-900 border border-gray-800 rounded-lg p-4">
+                                <div class="text-xs text-gray-500 mb-1">Durasi</div>
+                                <div id="duration" class="font-semibold">-</div>
+                            </div>
+                            <div class="bg-gray-900 border border-gray-800 rounded-lg p-4">
+                                <div class="text-xs text-gray-500 mb-1">Negara</div>
+                                <div id="country" class="font-semibold">-</div>
+                            </div>
+                        </div>
+
+                        <!-- Director -->
+                        <div class="mb-6">
+                            <div class="text-sm text-gray-500 mb-1">Sutradara</div>
+                            <div id="director" class="font-medium">-</div>
+                        </div>
+
+                        <!-- Genres -->
+                        <div class="mb-8">
+                            <div class="text-sm text-gray-500 mb-2">Genre</div>
+                            <div id="genres" class="flex flex-wrap gap-2"></div>
+                        </div>
+
+                        <!-- Synopsis -->
+                        <div>
+                            <h2 class="text-xl font-bold mb-3">Sinopsis</h2>
+                            <p id="sinopsis" class="text-gray-400 leading-relaxed">-</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Download Section -->
+        <div class="bg-gray-900">
+            <div class="container mx-auto px-4 py-12">
+                <div class="max-w-5xl mx-auto">
+                    <div class="flex items-center justify-between mb-8">
+                        <h2 class="text-2xl font-bold">Link Download</h2>
+                        <span class="text-sm text-gray-500">Pilih kualitas & server</span>
+                    </div>
+                    
+                    <div id="downloads" class="space-y-6">
+                        <!-- Download links akan dimuat di sini -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 border-t border-gray-800">
+        <div class="container mx-auto px-4 py-8">
+            <div class="text-center text-sm text-gray-500">
+                <p class="mb-1">&copy; 2025 Moviemu Lek</p>
+                <p>Developed by Yoga & Franky - Mahasiswa ITATS</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const API_URL = 'http://localhost:3000/api';
+
+        function getSlugFromURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('slug');
+        }
+
+        async function loadMovieDetail() {
+            const slug = getSlugFromURL();
+            
+            if (!slug) {
+                alert('Slug tidak ditemukan');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/${slug}`);
+                const result = await response.json();
+                
+                if (!result.success) {
+                    throw new Error(result.message);
+                }
+                
+                displayMovieDetail(result.data);
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Gagal memuat detail film');
+                window.location.href = 'index.html';
+            }
+        }
+
+        function displayMovieDetail(data) {
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('movieDetail').classList.remove('hidden');
+
+            // Set backdrop
+            if (data.poster) {
+                document.getElementById('backdrop').style.backgroundImage = `url(${data.poster})`;
+            }
+
+            // Basic info
+            document.getElementById('poster').src = data.poster || 'https://via.placeholder.com/300x450?text=No+Image';
+            document.getElementById('title').textContent = data.title;
+            document.getElementById('tagline').textContent = data.tagline || '';
+            document.getElementById('year').textContent = data.meta?.year || 'N/A';
+            document.getElementById('rating').innerHTML = `
+                <i class="fas fa-star text-yellow-500 text-xs"></i>
+                <span>${data.rating || 'N/A'}</span>
+            `;
+            document.getElementById('duration').textContent = data.meta?.duration || 'N/A';
+            document.getElementById('country').textContent = data.meta?.country || 'N/A';
+            document.getElementById('director').textContent = data.director || 'Tidak diketahui';
+            document.getElementById('sinopsis').textContent = data.sinopsis || 'Sinopsis tidak tersedia.';
+
+            // Page title
+            document.title = `${data.title} - Moviemu Lek`;
+
+            // Genres
+            const genresContainer = document.getElementById('genres');
+            if (data.genres && data.genres.length > 0) {
+                genresContainer.innerHTML = data.genres.map(genre => {
+                    const genreSlug = genre.url.replace('/api/genres/', '');
+                    return `<a href="search.html?genre=${genreSlug}" 
+                               class="px-3 py-1 bg-gray-800 border border-gray-700 rounded-full text-xs font-medium hover:bg-red-500 hover:border-red-500 transition cursor-pointer">
+                        ${genre.name}
+                    </a>`;
+                }).join('');
+            } else {
+                genresContainer.innerHTML = '<span class="text-gray-500 text-sm">Tidak ada genre</span>';
+            }
+
+            // Downloads
+            displayDownloads(data.downloads);
+        }
+
+        function displayDownloads(downloads) {
+            const container = document.getElementById('downloads');
+            
+            if (!downloads || downloads.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12 text-gray-500">
+                        <i class="fas fa-download text-4xl mb-4"></i>
+                        <p>Link download belum tersedia</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = downloads.map((download, index) => {
+                if (download.type === 'movie') {
+                    return `
+                        <div class="bg-gray-950 border border-gray-800 rounded-lg p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-semibold">${download.resolution}</h3>
+                                ${download.size ? `<span class="text-sm text-gray-500">${download.size}</span>` : ''}
+                            </div>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                ${download.links.map(link => `
+                                    <a href="${link.url}" 
+                                       target="_blank"
+                                       class="download-btn px-4 py-3 bg-red-500 hover:bg-red-600 rounded-lg text-center font-medium text-sm">
+                                        <i class="fas fa-download mr-2"></i>${link.host}
+                                    </a>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    return `
+                        <div class="bg-gray-950 border border-gray-800 rounded-lg p-6">
+                            <h3 class="text-lg font-semibold mb-4">${download.name}</h3>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                ${download.links.map(link => `
+                                    <a href="${link.url}" 
+                                       target="_blank"
+                                       class="download-btn px-4 py-3 bg-red-500 hover:bg-red-600 rounded-lg text-center font-medium text-sm">
+                                        <i class="fas fa-download mr-2"></i>${link.host}
+                                    </a>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+            }).join('');
+        }
+
+        loadMovieDetail();
+    </script>
+</body>
+</html>

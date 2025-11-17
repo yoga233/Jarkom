@@ -15,6 +15,21 @@ const {
 const app = express();
 const cache = new NodeCache({ stdTTL: 60 * 10 }); // cache 10 menit
 
+// ========== CORS MIDDLEWARE (WAJIB!) ==========
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    
+    // Handle preflight request
+    if (req.method === 'OPTIONS') {
+        return res.sendStatus(200);
+    }
+    
+    next();
+});
+// ===============================================
+
 app.use(
     "/api/",
     rateLimit({
@@ -196,17 +211,14 @@ app.get(
                 items: data.items,
                 pagination: {
                     first: `/api/search/${encodeURIComponent(keyword)}/page/1`,
-                    last: `/api/search/${encodeURIComponent(keyword)}/page/${data.totalPages
-                        }`,
+                    last: `/api/search/${encodeURIComponent(keyword)}/page/${data.totalPages}`,
                     prev:
                         data.page > 1
-                            ? `/api/search/${encodeURIComponent(keyword)}/page/${data.page - 1
-                            }`
+                            ? `/api/search/${encodeURIComponent(keyword)}/page/${data.page - 1}`
                             : null,
                     next:
                         data.page < data.totalPages
-                            ? `/api/search/${encodeURIComponent(keyword)}/page/${data.page + 1
-                            }`
+                            ? `/api/search/${encodeURIComponent(keyword)}/page/${data.page + 1}`
                             : null,
                 },
             };

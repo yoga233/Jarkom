@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moviemu Lek - Download Film Berkualitas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        .btn-primary {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        }
+        
+        .nav-link {
+            position: relative;
+            transition: color 0.2s;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #ef4444;
+            transition: width 0.2s;
+        }
+        
+        .nav-link:hover::after,
+        .nav-link.active::after {
+            width: 100%;
+        }
+        
+        .skeleton {
+            background: linear-gradient(90deg, #1f2937 0%, #374151 50%, #1f2937 100%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #111827;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #374151;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4b5563;
+        }
+    </style>
+</head>
+<body class="bg-gray-950 text-gray-100 antialiased">
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full bg-gray-900/95 backdrop-blur-sm border-b border-gray-800 z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between h-16">
+                <a href="index.html" class="flex items-center space-x-2">
+                    <i class="fas fa-film text-red-500 text-xl"></i>
+                    <span class="text-xl font-bold">Moviemu Lek</span>
+                </a>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.html" class="nav-link active text-sm font-medium">Beranda</a>
+                    <a href="search.html" class="nav-link text-sm font-medium text-gray-400 hover:text-white">Pencarian</a>
+                    <a href="browse.html" class="nav-link text-sm font-medium text-gray-400 hover:text-white">Jelajahi</a>
+                </div>
+                
+                <button onclick="toggleMobileMenu()" class="md:hidden text-gray-400 hover:text-white">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="hidden fixed inset-0 bg-gray-900 z-40 pt-20">
+        <div class="container mx-auto px-4">
+            <a href="index.html" class="block py-3 text-red-500 font-medium">Beranda</a>
+            <a href="search.html" class="block py-3 text-gray-400">Pencarian</a>
+            <a href="browse.html" class="block py-3 text-gray-400">Jelajahi</a>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="pt-24 pb-12 px-4">
+        <div class="container mx-auto">
+            <div class="max-w-3xl">
+                <h1 class="text-4xl md:text-5xl font-bold mb-4 leading-tight">
+                    Download Film & Series<br/>Berkualitas Tinggi
+                </h1>
+                <p class="text-lg text-gray-400 mb-8">
+                    Ribuan koleksi film dan series terbaru dengan kualitas HD. Download mudah dan cepat.
+                </p>
+                
+                <div class="relative max-w-xl">
+                    <input 
+                        type="text" 
+                        id="searchInput"
+                        placeholder="Cari film atau series..." 
+                        class="w-full px-4 py-3 pl-12 bg-gray-900 border border-gray-800 rounded-lg focus:outline-none focus:border-red-500 transition"
+                    >
+                    <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Filter Tabs -->
+    <section class="px-4 mb-8">
+        <div class="container mx-auto">
+            <div class="flex items-center space-x-4 border-b border-gray-800">
+                <button onclick="loadMovies()" class="tab-btn px-4 py-3 text-sm font-medium border-b-2 border-red-500">
+                    Film
+                </button>
+                <button onclick="loadSeries()" class="tab-btn px-4 py-3 text-sm font-medium text-gray-400 hover:text-white border-b-2 border-transparent">
+                    Series
+                </button>
+                <button onclick="loadAll()" class="tab-btn px-4 py-3 text-sm font-medium text-gray-400 hover:text-white border-b-2 border-transparent">
+                    Semua
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Loading Skeleton -->
+    <div id="loadingSkeleton" class="container mx-auto px-4 mb-12">
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
+            <div class="skeleton rounded-lg" style="height: 360px;"></div>
+            <div class="skeleton rounded-lg" style="height: 360px;"></div>
+            <div class="skeleton rounded-lg" style="height: 360px;"></div>
+            <div class="skeleton rounded-lg" style="height: 360px;"></div>
+            <div class="skeleton rounded-lg" style="height: 360px;"></div>
+            <div class="skeleton rounded-lg" style="height: 360px;"></div>
+        </div>
+    </div>
+
+    <!-- Content Grid -->
+    <section class="px-4 mb-12">
+        <div class="container mx-auto">
+            <h2 id="sectionTitle" class="text-2xl font-bold mb-6">Film Terbaru</h2>
+            <div id="moviesGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
+                <!-- Content akan dimuat di sini -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Pagination -->
+    <section class="px-4 mb-16">
+        <div class="container mx-auto">
+            <div id="pagination" class="flex justify-center items-center space-x-2">
+                <!-- Pagination akan dimuat di sini -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 border-t border-gray-800">
+        <div class="container mx-auto px-4 py-12">
+            <div class="grid md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <i class="fas fa-film text-red-500 text-xl"></i>
+                        <span class="text-lg font-bold">Moviemu Lek</span>
+                    </div>
+                    <p class="text-sm text-gray-400 leading-relaxed">
+                        Platform download film dan series terlengkap dengan kualitas terbaik.
+                    </p>
+                </div>
+                
+                <div>
+                    <h3 class="font-semibold mb-4">Kategori</h3>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="#" class="hover:text-white transition">Action</a></li>
+                        <li><a href="#" class="hover:text-white transition">Drama</a></li>
+                        <li><a href="#" class="hover:text-white transition">Comedy</a></li>
+                        <li><a href="#" class="hover:text-white transition">Horror</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="font-semibold mb-4">Navigasi</h3>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="index.html" class="hover:text-white transition">Beranda</a></li>
+                        <li><a href="search.html" class="hover:text-white transition">Pencarian</a></li>
+                        <li><a href="browse.html" class="hover:text-white transition">Jelajahi</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="font-semibold mb-4">Informasi</h3>
+                    <p class="text-sm text-gray-400 mb-2">
+                        Developed by Yoga & Franky
+                    </p>
+                    <p class="text-sm text-gray-400">
+                        Mahasiswa ITATS<br/>
+                        Tugas Pemrograman Jaringan
+                    </p>
+                </div>
+            </div>
+            
+            <div class="pt-8 border-t border-gray-800 text-center text-sm text-gray-500">
+                <p>&copy; 2025 Moviemu Lek. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const API_URL = 'http://localhost:3000/api';
+        let currentPage = 1;
+        let currentType = 'movies';
+
+        // Toggle mobile menu
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        // Update active tab
+        function updateActiveTab(activeBtn) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('border-red-500', 'text-white');
+                btn.classList.add('border-transparent', 'text-gray-400');
+            });
+            activeBtn.classList.add('border-red-500', 'text-white');
+            activeBtn.classList.remove('border-transparent', 'text-gray-400');
+        }
+
+        // Load movies
+        async function loadMovies(page = 1) {
+            currentType = 'movies';
+            currentPage = page;
+            updateActiveTab(event?.target || document.querySelector('.tab-btn'));
+            document.getElementById('sectionTitle').textContent = 'Film Terbaru';
+            showLoading();
+            
+            try {
+                const response = await fetch(`${API_URL}/movies/page/${page}`);
+                const data = await response.json();
+                displayContent(data.items);
+                displayPagination(data.page, data.totalPages);
+            } catch (error) {
+                console.error('Error:', error);
+                showError();
+            }
+            
+            hideLoading();
+        }
+
+        // Load series
+        async function loadSeries(page = 1) {
+            currentType = 'series';
+            currentPage = page;
+            updateActiveTab(event?.target || document.querySelectorAll('.tab-btn')[1]);
+            document.getElementById('sectionTitle').textContent = 'Series Terbaru';
+            showLoading();
+            
+            try {
+                const response = await fetch(`${API_URL}/series/page/${page}`);
+                const data = await response.json();
+                displayContent(data.items);
+                displayPagination(data.page, data.totalPages);
+            } catch (error) {
+                console.error('Error:', error);
+                showError();
+            }
+            
+            hideLoading();
+        }
+
+        // Load all
+        async function loadAll() {
+            currentType = 'all';
+            updateActiveTab(event?.target || document.querySelectorAll('.tab-btn')[2]);
+            document.getElementById('sectionTitle').textContent = 'Semua Konten';
+            showLoading();
+            
+            try {
+                const response = await fetch(`${API_URL}/`);
+                const data = await response.json();
+                const allItems = [...data.movies, ...data.series];
+                displayContent(allItems);
+                document.getElementById('pagination').innerHTML = '';
+            } catch (error) {
+                console.error('Error:', error);
+                showError();
+            }
+            
+            hideLoading();
+        }
+
+        // Display content
+        function displayContent(items) {
+            const grid = document.getElementById('moviesGrid');
+            
+            if (items.length === 0) {
+                grid.innerHTML = '<div class="col-span-full text-center text-gray-400 py-12">Tidak ada data</div>';
+                return;
+            }
+            
+            grid.innerHTML = items.map(item => `
+                <div class="card bg-gray-900 rounded-lg overflow-hidden cursor-pointer group" 
+                     onclick="goToDetail('${item.url}')">
+                    <div class="relative aspect-[2/3] overflow-hidden bg-gray-800">
+                        <img src="${item.poster}" 
+                             alt="${item.title}" 
+                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                             onerror="this.src='https://via.placeholder.com/300x450?text=No+Image'">
+                        ${item.quality ? `
+                            <div class="absolute top-2 right-2 px-2 py-1 bg-red-500 text-xs font-semibold rounded">
+                                ${item.quality}
+                            </div>
+                        ` : ''}
+                        <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <i class="fas fa-play-circle text-white text-4xl"></i>
+                        </div>
+                    </div>
+                    <div class="p-3">
+                        <h3 class="font-semibold text-sm mb-2 line-clamp-1 group-hover:text-red-500 transition">${item.title}</h3>
+                        <div class="flex items-center justify-between text-xs text-gray-400">
+                            <span>${item.year}</span>
+                            <span class="flex items-center space-x-1">
+                                <i class="fas fa-star text-yellow-500 text-xs"></i>
+                                <span>${item.rating}</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Display pagination
+        function displayPagination(currentPage, totalPages) {
+            const container = document.getElementById('pagination');
+            let buttons = [];
+            
+            // Previous button
+            if (currentPage > 1) {
+                buttons.push(`
+                    <button onclick="changePage(${currentPage - 1})" 
+                            class="px-4 py-2 bg-gray-900 hover:bg-gray-800 rounded-lg transition">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                `);
+            }
+            
+            // Page numbers
+            const startPage = Math.max(1, currentPage - 2);
+            const endPage = Math.min(totalPages, currentPage + 2);
+            
+            if (startPage > 1) {
+                buttons.push(`
+                    <button onclick="changePage(1)" class="px-4 py-2 bg-gray-900 hover:bg-gray-800 rounded-lg transition">1</button>
+                    ${startPage > 2 ? '<span class="px-2 text-gray-500">...</span>' : ''}
+                `);
+            }
+            
+            for (let i = startPage; i <= endPage; i++) {
+                const isActive = i === currentPage;
+                buttons.push(`
+                    <button onclick="changePage(${i})" 
+                            class="px-4 py-2 rounded-lg transition ${isActive ? 'bg-red-500 text-white' : 'bg-gray-900 hover:bg-gray-800'}">
+                        ${i}
+                    </button>
+                `);
+            }
+            
+            if (endPage < totalPages) {
+                buttons.push(`
+                    ${endPage < totalPages - 1 ? '<span class="px-2 text-gray-500">...</span>' : ''}
+                    <button onclick="changePage(${totalPages})" class="px-4 py-2 bg-gray-900 hover:bg-gray-800 rounded-lg transition">${totalPages}</button>
+                `);
+            }
+            
+            // Next button
+            if (currentPage < totalPages) {
+                buttons.push(`
+                    <button onclick="changePage(${currentPage + 1})" 
+                            class="px-4 py-2 bg-gray-900 hover:bg-gray-800 rounded-lg transition">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                `);
+            }
+            
+            container.innerHTML = buttons.join('');
+        }
+
+        // Change page
+        function changePage(page) {
+            if (currentType === 'movies') {
+                loadMovies(page);
+            } else if (currentType === 'series') {
+                loadSeries(page);
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Go to detail
+        function goToDetail(url) {
+            const slug = url.replace('/api/', '');
+            window.location.href = `detail.html?slug=${slug}`;
+        }
+
+        // Search
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && this.value.trim()) {
+                window.location.href = `search.html?q=${encodeURIComponent(this.value)}`;
+            }
+        });
+
+        // Loading states
+        function showLoading() {
+            document.getElementById('loadingSkeleton').style.display = 'grid';
+            document.getElementById('moviesGrid').style.opacity = '0.3';
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingSkeleton').style.display = 'none';
+            document.getElementById('moviesGrid').style.opacity = '1';
+        }
+
+        function showError() {
+            document.getElementById('moviesGrid').innerHTML = `
+                <div class="col-span-full text-center py-12">
+                    <i class="fas fa-exclamation-circle text-4xl text-red-500 mb-4"></i>
+                    <p class="text-gray-400">Terjadi kesalahan. Pastikan backend sudah berjalan.</p>
+                </div>
+            `;
+        }
+
+        // Initialize
+        loadMovies();
+    </script>
+</body>
+</html>

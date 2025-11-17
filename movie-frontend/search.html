@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pencarian - Moviemu Lek</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        .genre-btn {
+            transition: all 0.2s;
+        }
+        
+        .genre-btn:hover {
+            transform: translateY(-1px);
+        }
+        
+        .genre-btn.active {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        }
+        
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #111827;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #374151;
+            border-radius: 4px;
+        }
+        
+        .skeleton {
+            background: linear-gradient(90deg, #1f2937 0%, #374151 50%, #1f2937 100%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+    </style>
+</head>
+<body class="bg-gray-950 text-gray-100 min-h-screen">
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full bg-gray-900/95 backdrop-blur-sm border-b border-gray-800 z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between h-16">
+                <a href="index.html" class="flex items-center space-x-2">
+                    <i class="fas fa-film text-red-500 text-xl"></i>
+                    <span class="text-xl font-bold">Moviemu Lek</span>
+                </a>
+                
+                <div class="flex items-center space-x-6">
+                    <a href="index.html" class="text-sm font-medium text-gray-400 hover:text-white transition">Beranda</a>
+                    <a href="search.html" class="text-sm font-medium text-red-500">Pencarian</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Search Section -->
+    <section class="pt-24 pb-8 px-4">
+        <div class="container mx-auto">
+            <h1 class="text-3xl font-bold mb-6">Pencarian</h1>
+            
+            <div class="max-w-2xl mb-8">
+                <div class="relative">
+                    <input 
+                        type="text" 
+                        id="searchInput"
+                        placeholder="Cari film atau series..." 
+                        class="w-full px-4 py-3 pl-12 bg-gray-900 border border-gray-800 rounded-lg focus:outline-none focus:border-red-500 transition"
+                    >
+                    <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
+                    <button onclick="searchNow()" class="absolute right-2 top-1/2 transform -translate-y-1/2 px-6 py-2 bg-red-500 hover:bg-red-600 rounded-md text-sm font-medium transition">
+                        Cari
+                    </button>
+                </div>
+            </div>
+
+            <!-- Genre Filter -->
+            <div class="bg-gray-900 border border-gray-800 rounded-lg p-6 mb-8">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="font-semibold">Filter Genre</h2>
+                    <button onclick="clearGenre()" class="text-sm text-gray-400 hover:text-red-500 transition">
+                        Reset
+                    </button>
+                </div>
+                <div id="genresList" class="flex flex-wrap gap-2">
+                    <div class="text-sm text-gray-500">Memuat genre...</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Loading Skeleton -->
+    <div id="loadingSkeleton" class="hidden container mx-auto px-4 mb-12">
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
+            <div class="skeleton rounded-lg" style="height: 360px;"></div>
+            <div class="skeleton rounded-lg" style="height: 360px;"></div>
+            <div class="skeleton rounded-lg" style="height: 360px;"></div>
+            <div class="skeleton rounded-lg" style="height: 360px;"></div>
+            <div class="skeleton rounded-lg" style="height: 360px;"></div>
+            <div class="skeleton rounded-lg" style="height: 360px;"></div>
+        </div>
+    </div>
+
+    <!-- Results Section -->
+    <section id="resultsSection" class="hidden px-4 mb-12">
+        <div class="container mx-auto">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold">
+                    Hasil: <span id="resultCount" class="text-red-500"></span>
+                </h2>
+            </div>
+            
+            <div id="resultsGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
+                <!-- Results -->
+            </div>
+
+            <!-- Pagination -->
+            <div id="pagination" class="mt-12 flex justify-center items-center space-x-2">
+                <!-- Pagination -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Empty State -->
+    <div id="emptyState" class="container mx-auto px-4 py-20 text-center">
+        <i class="fas fa-search text-6xl text-gray-700 mb-6"></i>
+        <h3 class="text-2xl font-bold mb-3">Mulai Pencarian</h3>
+        <p class="text-gray-400 max-w-md mx-auto">
+            Ketik kata kunci di atas atau pilih genre untuk menemukan film favorit
+        </p>
+    </div>
+
+    <!-- No Results -->
+    <div id="noResults" class="hidden container mx-auto px-4 py-20 text-center">
+        <i class="fas fa-exclamation-circle text-6xl text-gray-700 mb-6"></i>
+        <h3 class="text-2xl font-bold mb-3">Tidak Ditemukan</h3>
+        <p class="text-gray-400 mb-6">Coba gunakan kata kunci lain atau filter genre berbeda</p>
+        <button onclick="clearSearch()" class="px-6 py-2 bg-red-500 hover:bg-red-600 rounded-lg font-medium transition">
+            Cari Lagi
+        </button>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 border-t border-gray-800 mt-auto">
+        <div class="container mx-auto px-4 py-8">
+            <div class="text-center text-sm text-gray-500">
+                <p class="mb-1">&copy; 2025 Moviemu Lek</p>
+                <p>Developed by Yoga & Franky - Mahasiswa ITATS</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const API_URL = 'http://localhost:3000/api';
+        let currentKeyword = '';
+        let currentPage = 1;
+        let selectedGenre = '';
+
+        // Load genres
+        async function loadGenres() {
+            try {
+                const response = await fetch(`${API_URL}/genres`);
+                const result = await response.json();
+                displayGenres(result.data);
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('genresList').innerHTML = '<span class="text-red-500 text-sm">Gagal memuat genre</span>';
+            }
+        }
+
+        // Display genres
+        function displayGenres(genres) {
+            const container = document.getElementById('genresList');
+            container.innerHTML = genres.map(genre => `
+                <button 
+                    onclick="searchByGenre('${genre.url.replace('/api/genres/', '')}')"
+                    class="genre-btn px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm font-medium border border-gray-700">
+                    ${genre.name}
+                </button>
+            `).join('');
+        }
+
+        // Search by keyword
+        async function searchByKeyword(keyword, page = 1) {
+            currentKeyword = keyword;
+            currentPage = page;
+            selectedGenre = '';
+
+            if (!keyword.trim()) {
+                alert('Masukkan kata kunci pencarian');
+                return;
+            }
+
+            showLoading();
+            hideStates();
+
+            try {
+                const response = await fetch(`${API_URL}/search/${encodeURIComponent(keyword)}/page/${page}`);
+                const data = await response.json();
+                
+                if (data.items.length === 0) {
+                    showNoResults();
+                } else {
+                    displayResults(data.items, data.keyword, data.items.length);
+                    displayPagination(data.page, data.totalPages);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Pencarian gagal');
+            }
+
+            hideLoading();
+        }
+
+        // Search by genre
+        async function searchByGenre(genreSlug, page = 1) {
+            selectedGenre = genreSlug;
+            currentPage = page;
+            currentKeyword = '';
+
+            // Update active state
+            document.querySelectorAll('.genre-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            showLoading();
+            hideStates();
+
+            try {
+                const response = await fetch(`${API_URL}/genres/${genreSlug}/page/${page}`);
+                const data = await response.json();
+                
+                if (data.items.length === 0) {
+                    showNoResults();
+                } else {
+                    displayResults(data.items, `Genre: ${data.genre}`, data.items.length);
+                    displayPagination(data.page, data.totalPages);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Gagal memuat genre');
+            }
+
+            hideLoading();
+        }
+
+        // Search now
+        function searchNow() {
+            const keyword = document.getElementById('searchInput').value;
+            searchByKeyword(keyword);
+        }
+
+        // Clear genre
+        function clearGenre() {
+            document.querySelectorAll('.genre-btn').forEach(btn => btn.classList.remove('active'));
+            selectedGenre = '';
+            if (currentKeyword) {
+                searchByKeyword(currentKeyword);
+            }
+        }
+
+        // Clear search
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            currentKeyword = '';
+            selectedGenre = '';
+            showEmpty();
+        }
+
+        // Display results
+        function displayResults(items, searchTerm, count) {
+            document.getElementById('resultsSection').classList.remove('hidden');
+            document.getElementById('resultCount').textContent = `"${searchTerm}" (${count})`;
+            
+            const grid = document.getElementById('resultsGrid');
+            grid.innerHTML = items.map(item => `
+                <div class="card bg-gray-900 rounded-lg overflow-hidden cursor-pointer group" 
+                     onclick="goToDetail('${item.url}')">
+                    <div class="relative aspect-[2/3] overflow-hidden bg-gray-800">
+                        <img src="${item.poster}" 
+                             alt="${item.title}" 
+                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                             onerror="this.src='https://via.placeholder.com/300x450?text=No+Image'">
+                        ${item.quality ? `
+                            <div class="absolute top-2 right-2 px-2 py-1 bg-red-500 text-xs font-semibold rounded">
+                                ${item.quality}
+                            </div>
+                        ` : ''}
+                        <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <i class="fas fa-play-circle text-white text-4xl"></i>
+                        </div>
+                    </div>
+                    <div class="p-3">
+                        <h3 class="font-semibold text-sm mb-2 line-clamp-1 group-hover:text-red-500 transition">${item.title}</h3>
+                        <div class="flex items-center justify-between text-xs text-gray-400">
+                            <span>${item.year}</span>
+                            <span class="flex items-center space-x-1">
+                                <i class="fas fa-star text-yellow-500 text-xs"></i>
+                                <span>${item.rating}</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Display pagination
+        function displayPagination(currentPage, totalPages) {
+            const container = document.getElementById('pagination');
+            let buttons = [];
+            
+            if (currentPage > 1) {
+                buttons.push(`
+                    <button onclick="changePage(${currentPage - 1})" 
+                            class="px-4 py-2 bg-gray-900 hover:bg-gray-800 rounded-lg transition">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                `);
+            }
+            
+            const startPage = Math.max(1, currentPage - 2);
+            const endPage = Math.min(totalPages, currentPage + 2);
+            
+            for (let i = startPage; i <= endPage; i++) {
+                const isActive = i === currentPage;
+                buttons.push(`
+                    <button onclick="changePage(${i})" 
+                            class="px-4 py-2 rounded-lg transition ${isActive ? 'bg-red-500' : 'bg-gray-900 hover:bg-gray-800'}">
+                        ${i}
+                    </button>
+                `);
+            }
+            
+            if (currentPage < totalPages) {
+                buttons.push(`
+                    <button onclick="changePage(${currentPage + 1})" 
+                            class="px-4 py-2 bg-gray-900 hover:bg-gray-800 rounded-lg transition">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                `);
+            }
+            
+            container.innerHTML = buttons.join('');
+        }
+
+        // Change page
+        function changePage(page) {
+            if (currentKeyword) {
+                searchByKeyword(currentKeyword, page);
+            } else if (selectedGenre) {
+                searchByGenre(selectedGenre, page);
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Go to detail
+        function goToDetail(url) {
+            const slug = url.replace('/api/', '');
+            window.location.href = `detail.html?slug=${slug}`;
+        }
+
+        // State management
+        function showLoading() {
+            document.getElementById('loadingSkeleton').classList.remove('hidden');
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingSkeleton').classList.add('hidden');
+        }
+
+        function hideStates() {
+            document.getElementById('emptyState').classList.add('hidden');
+            document.getElementById('noResults').classList.add('hidden');
+            document.getElementById('resultsSection').classList.add('hidden');
+        }
+
+        function showEmpty() {
+            hideStates();
+            document.getElementById('emptyState').classList.remove('hidden');
+        }
+
+        function showNoResults() {
+            hideStates();
+            document.getElementById('noResults').classList.remove('hidden');
+        }
+
+        // Event listeners
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchNow();
+            }
+        });
+
+        // Check URL params
+        const urlParams = new URLSearchParams(window.location.search);
+        const queryParam = urlParams.get('q');
+        if (queryParam) {
+            document.getElementById('searchInput').value = queryParam;
+            searchByKeyword(queryParam);
+        }
+
+        // Initialize
+        loadGenres();
+    </script>
+</body>
+</html>
