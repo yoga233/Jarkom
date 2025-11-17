@@ -99,11 +99,8 @@ async function scrapeDetail(url) {
         .text()
         .replace("Director:", "")
         .trim();
-    const rating = $("p strong:contains('Rating')")
-        .parent()
-        .text()
-        .replace("Rating:", "")
-        .trim();
+    const rating = $("div.tpost div span")
+        .first().text().trim();
 
     const genres = [];
     $("p.mt-3 a").each((i, el) => {
@@ -114,7 +111,7 @@ async function scrapeDetail(url) {
     });
     const sinopsis = $("#tab-1 p").text().trim();
     const poster =
-        $("div.poster img").attr("data-src") || $("div.poster img").attr("src");
+        $("img.wp-post-image").attr("data-src") || $("img.wp-post-image").attr("src");
 
     let downloads = [];
 
@@ -321,7 +318,7 @@ async function scrapeGenrePage(genreSlug, page = 1) {
     });
 
     let totalPages = 1;
-    const pagesText = $(".wp-pagenavi .pages").text(); // misal: "Page 1 of 50"
+    const pagesText = $(".wp-pagenavi .pages").text();
     if (pagesText) {
         const parts = pagesText.split("of");
         if (parts.length === 2) {
