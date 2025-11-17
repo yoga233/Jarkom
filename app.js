@@ -13,22 +13,19 @@ const {
 } = require("./scraper/cheerio");
 
 const app = express();
-const cache = new NodeCache({ stdTTL: 60 * 10 }); // cache 10 menit
+const cache = new NodeCache({ stdTTL: 60 * 10 });
 
-// ========== CORS MIDDLEWARE (WAJIB!) ==========
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     
-    // Handle preflight request
     if (req.method === 'OPTIONS') {
         return res.sendStatus(200);
     }
     
     next();
 });
-// ===============================================
 
 app.use(
     "/api/",
